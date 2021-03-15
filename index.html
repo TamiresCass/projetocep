@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="./script/jquery-3.1.1.min.js"></script>
+        <script src="./script/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="./script/bootstrap.min.css">
+        <Title>Buscar CEP da cidade</Title>
+    </head>
+    <style>
+        .column{
+            display: flex;
+            flex-direction: column;
+        }
+        .margemInput{
+            margin-bottom: 20px;
+            width: 300px;
+        }
+
+        .styleButton{
+            width: 100px;
+            margin-bottom: 30px;
+            margin-left: 200px;
+        }
+
+        .divGeral{
+            margin-left: 37rem;
+            margin-top: 6rem;
+        }
+
+        h1{
+            display: flex;
+            justify-content: center;
+        }
+
+        h4{
+            display: flex;
+            justify-content: center;
+        }
+
+        body {
+            background-color: rgb(236, 236, 236);
+        }
+
+        #mensagemValidacao{
+            color: red;
+        }
+    </style>
+    <body>
+        <h1>Busca de CEP de cidades</h1>
+        <h4>Pesquisa realizada por CEP de cidade e não bairro especifico</h4>
+        <div class="divGeral">
+            <div class="column">
+                <label for="">Digite um CEP no formato 00000-000</label>
+                <input type="text" placeholder="Digite um CEP válido" id="cep" data-mask="00000-000" class="margemInput form-control" maxlength="9" required>
+                <span id="mensagemValidacao"></span>
+                <button id="botaoEnviar" class="styleButton btn-primary btn">Buscar</button>
+            </div>
+    
+            <div class="column">
+                <label for="">Cidade</label>
+                <input type="text" id="localidade" class="margemInput form-control" readonly>
+                <label for="">Estado</label>
+                <input type="text" id="estado" class="margemInput form-control" readonly>
+            </div>
+        </div>
+
+    </body>
+    <script>
+        $(document).ready(function(){
+            $("#botaoEnviar").on("click",function(){
+                $("#mensagemValidacao").hide();
+                var cep = $("#cep").val();
+                let cepValido = /^\d+$/.test(cep);
+                if(cep.length < 9 || cepValido == "false"){
+                    $("#mensagemValidacao").html("CEP inválido");
+                    $("#mensagemValidacao").show();
+                } else {
+                    $.ajax({
+                    crossDomain: true,
+                    url: "http://api.zippopotam.us/BR/"+ cep,
+                    method: 'GET',                  
+
+
+                    }).done(function(res){
+                        console.log(res);
+                        if(res.erro == "true"){
+                            alert("CEP não encontrado");
+                            $("#localidade").val("");
+                            $("#estado").val("");
+                        } else {
+                            $("#localidade").val(res.places[0]['place name']);
+                            $("#estado").val(res.places[0].state);
+                        }
+    
+                    });
+                }
+            });
+        });
+    </script>
+</html>
